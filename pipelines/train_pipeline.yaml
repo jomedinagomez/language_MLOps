@@ -16,17 +16,17 @@ inputs:
     path: azureml:MultiLabelClassification_train@latest #Input 
     type: uri_file
   validation_file:
-    path: datasets/validation.jsonl
+    path: azureml:MultiLabelClassification_validation:1
     type: uri_file
   test_file:
-    path: datasets/test.jsonl
+    path: azureml:MultiLabelClassification_test:1
     type: uri_file
   # deepspeed config files
   ds_finetune:
-    path: deepspeed_configs/zero1.json
+    path: ./deepspeed_configs/zero1.json
     type: uri_file
   ds_inference:
-    path: deepspeed_configs/zero3.json
+    path: ./deepspeed_configs/zero3.json
     type: uri_file
 
 jobs:
