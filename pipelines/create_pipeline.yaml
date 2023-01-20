@@ -1,0 +1,107 @@
+$schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
+type: pipeline
+
+experiment_name: AzureML-Train-Finetune-Samples
+
+display_name: bert-base-uncased_pipeline_run_cli_multilabel
+
+# You can change path to your custom files by registering in Data and use their 'Named asset URI' below
+inputs:
+  # dataset files
+  train_file:
+    path: datasets/train.jsonl
+    type: uri_file
+  validation_file:
+    path: datasets/validation.jsonl
+    type: uri_file
+  test_file:
+    path: datasets/test.jsonl
+    type: uri_file
+  # deepspeed config files
+  ds_finetune:
+    path: deepspeed_configs/zero1.json
+    type: uri_file
+  ds_inference:
+    path: deepspeed_configs/zero3.json
+    type: uri_file
+
+jobs:
+  model_selection:
+    type: command
+    component: azureml://registries/azureml-preview/components/textclassificationmultilabel_modelselection/versions/0.0.5
+    compute: sample-preprocess-cluster
+    inputs:
+      huggingface_id: bert-base-uncased
+    outputs:
+      output_dir:
+        type: uri_folder
+
+  data_pre_process:
+    type: command
+    component: azureml://registries/azureml-preview/components/textclassificationmultilabel_datapreprocessing/versions/0.0.5
+    compute: sample-preprocess-cluster
+    inputs:
+      model_path: ${{parent.jobs.model_selection.outputs.output_dir}}
+      train_file_path: ${{parent.inputs.train_file}}
+      valid_file_path: ${{parent.inputs.validation_file}}
+      sentence1_key: sentence
+      sentence2_key: ""
+      label_key: labels
+    outputs:
+      output_dir:
+        type: uri_folder
+  
+  finetuning:
+    type: command
+    component: azureml://registries/azureml-preview/components/textclassificationmultilabel_finetuning/versions/0.0.5
+    compute: sample-finetune-cluster
+    inputs:
+      model_path: ${{parent.jobs.model_selection.outputs.output_dir}}
+      dataset_path: ${{parent.jobs.data_pre_process.outputs.output_dir}}
+      lora_alpha: 128
+      lora_r: 8
+      lora_dropout: 0.0
+      epochs: 10
+      optimizer: adamw_torch
+      learning_rate: 2e-5
+      train_batch_size: 1
+      valid_batch_size: 1
+      apply_deepspeed: "false"
+      apply_ort: "false"
+      apply_lora: "false"
+      merge_lora_weights: "true"
+      auto_find_batch_size: "false"
+      save_as_mlflow_model: "true"
+      evaluation_strategy: steps
+      evaluation_steps_interval: 0.25
+      logging_strategy: steps
+      logging_steps: 100
+    outputs:
+      pytorch_model_folder:
+        type: uri_folder
+      mlflow_model_folder:
+        type: mlflow_model
+
+  evaluate_model:
+    type: command
+    component: azureml://registries/azureml-preview/components/evaluate_model/versions/0.0.3.preview
+    compute: sample-finetune-cluster
+    inputs:
+      task: text-classification-multilabel
+      test_data: ${{parent.inputs.validation_file}}
+      mlflow_model: ${{parent.jobs.finetuning.outputs.mlflow_model_folder}}
+      test_data_label_column_name: labels
+      test_data_input_column_names: sentence
+
+      device: gpu
+
+  # Uncomment below lines to register model to workspace
+  # register:
+  #   type: command
+  #   component: azureml://registries/azureml-preview/components/register_model/versions/0.0.5
+  #   compute: sample-managed-id-cluster
+  #   inputs:
+  #     model_path: ${{parent.jobs.finetuning.outputs.mlflow_model_folder}}
+  #     name_for_registered_model: sample_model_multi_label_classification
+  #     model_type: mlflow_model
+  #     registry_name: ""
