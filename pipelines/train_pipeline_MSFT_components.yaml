@@ -65,7 +65,7 @@ jobs:
       lora_alpha: 128
       lora_r: 8
       lora_dropout: 0.0
-      epochs: 1
+      epochs: 5
       learning_rate: 2e-5
       train_batch_size: 1
       valid_batch_size: 1
