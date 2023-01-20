@@ -83,7 +83,7 @@ jobs:
 
   evaluate_model:
     type: command
-    component: azureml://registries/azureml-preview/components/evaluate_model/versions/0.0.5.preview
+    component: azureml://registries/azureml-preview/components/evaluate_model/versions/0.0.4.preview
     compute: sample-finetune-cluster
     inputs:
       task: text-classification
