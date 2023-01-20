@@ -23,15 +23,16 @@ inputs:
     type: uri_file
   # deepspeed config files
   ds_finetune:
-    path: ./deepspeed_configs/zero1.json
+    path: ../deepspeed_configs/zero1.json
     type: uri_file
   ds_inference:
-    path: ./deepspeed_configs/zero3.json
+    path: ../deepspeed_configs/zero3.json
     type: uri_file
 
 jobs:
   model_selection:
     type: command
+    name: model selection
     component: azureml://registries/azureml-preview/components/textclassificationmultilabel_modelselection/versions/0.0.5
     compute: sample-preprocess-cluster
     inputs:
@@ -42,6 +43,7 @@ jobs:
 
   data_pre_process:
     type: command
+    name: data preprocessing
     component: azureml://registries/azureml-preview/components/textclassificationmultilabel_datapreprocessing/versions/0.0.5
     compute: sample-preprocess-cluster
     inputs:
@@ -57,6 +59,7 @@ jobs:
   
   finetuning:
     type: command
+    name: finetuning
     component: azureml://registries/azureml-preview/components/textclassificationmultilabel_finetuning/versions/0.0.5
     compute: sample-finetune-cluster
     inputs:
@@ -65,7 +68,7 @@ jobs:
       lora_alpha: 128
       lora_r: 8
       lora_dropout: 0.0
-      epochs: 10
+      epochs: 1
       optimizer: adamw_torch
       learning_rate: 2e-5
       train_batch_size: 1
@@ -88,6 +91,7 @@ jobs:
 
   evaluate_model:
     type: command
+    name: evaluate trained model
     component: azureml://registries/azureml-preview/components/evaluate_model/versions/0.0.3.preview
     compute: sample-finetune-cluster
     inputs:
