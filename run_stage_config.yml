@@ -7,7 +7,7 @@ variables:
   ap_vm_image: ubuntu-20.04
 
   location: eastus2
-  environment: dev
+  environment: prod
 
   # Azure DevOps
   ado_service_connection_rg: Azure-ARM-$(environment)
