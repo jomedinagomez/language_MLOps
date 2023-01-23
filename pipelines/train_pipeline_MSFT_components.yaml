@@ -65,7 +65,7 @@ jobs:
       lora_alpha: 128
       lora_r: 8
       lora_dropout: 0.0
-      epochs: 5
+      epochs: 1
       learning_rate: 2e-5
       train_batch_size: 1
       valid_batch_size: 1
@@ -93,13 +93,12 @@ jobs:
       test_data_input_column_names: sentence
       device: gpu
 
-  # Uncomment below lines to register model to workspace
-  # register:
-  #   type: command
-  #   component: azureml://registries/azureml-preview/components/register_model/versions/0.0.7
-  #   compute: sample-managed-id-cluster
-  #   inputs:
-  #     model_path: ${{parent.jobs.finetuning.outputs.mlflow_model_folder}}
-  #     name_for_registered_model: sample_model_single_label_classification
-  #     model_type: mlflow_model
-  #     registry_name: ""
+  register:
+    type: command
+    component: azureml://registries/azureml-preview/components/register_model/versions/0.0.7
+    compute: sample-managed-id-cluster
+    inputs:
+      model_path: ${{parent.jobs.finetuning.outputs.mlflow_model_folder}}
+      name_for_registered_model: sample_model_single_label_classification
+      model_type: mlflow_model
+      registry_name: ""
