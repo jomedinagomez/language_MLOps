@@ -7,7 +7,8 @@ variables:
   ap_vm_image: ubuntu-20.04
 
   location: eastus2
-  environment: prod
+  environment: dev
+  prefix: single_label_classification_jamg
 
   # Azure DevOps
   ado_service_connection_rg: Azure-ARM-$(environment)
@@ -19,3 +20,13 @@ variables:
   resource_group: language_$(environment)_rg
   aml_workspace: language_$(environment)_ws
 
+  name_for_registered_model: sample_model_single_label_classification
+
+  endpoint_name: $(prefix)_language_$(environment)
+
+  cpu_deployment_name: cpu_test
+  cpu_instance_count: 1
+  cpu_instance_type: Standard_F8s_v2
+  gpu_deployment_name: gpu_test
+  triton_deployment_name: triton_test
+  

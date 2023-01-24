@@ -11,6 +11,7 @@ inputs:
   # There are several ways to provide file, if its a data in
   # azureml:<<datasetname>>@latest or azureml:<<datasetname>>:<<version>>
   # azureml://subscriptions/<<subscriptionname>>/resourcegroups/<<resourcegroupname>>/workspaces/<<workspacename>>/datastores/workspaceblobstore/paths/PATH
+  name_for_registered_model: sample_model_single_label_classification
 
   train_file:
     path: azureml:MultiLabelClassification_train@latest #Input 
@@ -99,6 +100,6 @@ jobs:
     compute: sample-managed-id-cluster
     inputs:
       model_path: ${{parent.jobs.finetuning.outputs.mlflow_model_folder}}
-      name_for_registered_model: sample_model_single_label_classification
+      name_for_registered_model: ${{parent.inputs.name_for_registered_model}}
       model_type: mlflow_model
       registry_name: ""

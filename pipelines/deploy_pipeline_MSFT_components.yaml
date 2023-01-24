@@ -1,0 +1,63 @@
+$schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
+type: pipeline
+
+experiment_name: AzureML-Deploy-Samples
+
+display_name: deploy_azureml_textclassificationsinglelabel
+
+# You can change path to your custom files by registering in Data and use their 'Named asset URI' below
+inputs:
+  # dataset files
+  # There are several ways to provide file, if its a data in
+  # azureml:<<datasetname>>@latest or azureml:<<datasetname>>:<<version>>
+  # azureml://subscriptions/<<subscriptionname>>/resourcegroups/<<resourcegroupname>>/workspaces/<<workspacename>>/datastores/workspaceblobstore/paths/PATH
+  cpu_deployment_name:
+    type: string
+    optional: false
+    default: cpu_test
+  name_for_registered_model:
+    type: string
+    optional: false
+    default: sample_model_single_label_classification
+  endpoint_name:
+    type: string
+    optional: false
+    default: single_label_classification_jamg_language_dev
+  cpu_instance_type:
+    type: string
+    optional: false
+    default: Standard_F8s_v2
+  
+  cpu_instance_count:
+      type: string
+      optional: false
+      default: 1
+
+  apply_ort:
+    type: string
+    optional: True
+    default: false
+    description: If set to true, will use the ONNXRunTime scoring
+    enum:
+    - true
+    - false
+  apply_deepspeed:
+    type: string
+    optional: True
+    default: false
+    description: If set to true, will enable deepspeed for scoring
+    enum:
+    - true
+    - false
+
+jobs:
+  register:
+    type: command
+    component: azureml://registries/azureml-preview/components/azureml_textclassificationsinglelabel_deploy/versions/0.0.1
+    compute: sample-managed-id-cluster
+    inputs:
+      name: ${{parent.inputs.cpu_deployment_name}}
+      name_for_registered_model: ${{parent.inputs.name_for_registered_model}}
+      endpoint_name: ${{parent.inputs.endpoint_name}}
+      instance_type: ${{parent.inputs.cpu_instance_type}}
+      instance_count: ${{parent.inputs.cpu_instance_count}}
