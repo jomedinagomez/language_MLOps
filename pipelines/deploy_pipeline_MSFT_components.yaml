@@ -29,7 +29,7 @@ inputs:
     default: Standard_F8s_v2
   
   cpu_instance_count:
-      type: string
+      type: integer
       optional: false
       default: 1
 
