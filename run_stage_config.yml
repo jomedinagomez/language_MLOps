@@ -8,7 +8,7 @@ variables:
 
   location: eastus2
   environment: dev
-  prefix: single_label_classification_jamg
+  prefix: sl_class_jamg
 
   # Azure DevOps
   ado_service_connection_rg: Azure-ARM-$(environment)
@@ -22,11 +22,11 @@ variables:
 
   name_for_registered_model: sample_model_single_label_classification
 
-  endpoint_name: $(prefix)_language_$(environment)
+  endpoint_name: $(prefix)_nlp_$(environment)
 
-  cpu_deployment_name: cpu_test
+  cpu_deployment_name: cpu-test
   cpu_instance_count: 1
   cpu_instance_type: Standard_F8s_v2
-  gpu_deployment_name: gpu_test
-  triton_deployment_name: triton_test
+  gpu_deployment_name: gpu-test
+  triton_deployment_name: triton-test
   

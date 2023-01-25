@@ -9,9 +9,9 @@ inputs:
   # There are several ways to provide file, if its a data in
   # azureml:<<datasetname>>@latest or azureml:<<datasetname>>:<<version>>
   # azureml://subscriptions/<<subscriptionname>>/resourcegroups/<<resourcegroupname>>/workspaces/<<workspacename>>/datastores/workspaceblobstore/paths/PATH
-  cpu_deployment_name: cpu_test
+  cpu_deployment_name: cpu-test
   name_for_registered_model: sample_model_single_label_classification
-  endpoint_name: single_label_classification_jamg_language_dev
+  endpoint_name: sl-class-jamg-nlp-dev
   cpu_instance_type: Standard_F8s_v2
   cpu_instance_count: 1
   apply_ort: "false"

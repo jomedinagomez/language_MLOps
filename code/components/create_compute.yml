@@ -1,0 +1,12 @@
+$schema: https://azuremlschemas.azureedge.net/latest/amlCompute.schema.json
+type: amlcompute
+#enter name for the compute
+name: sample-finetune-cluster
+#enter VM size
+size: Standard_NC6s_v3
+#enter minimum number of instances
+min_instances: 0
+#enter maximum number of instances
+max_instances: 1
+#enter idle time in seconds
+idle_time_before_scale_down: 120

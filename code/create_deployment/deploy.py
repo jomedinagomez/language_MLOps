@@ -103,18 +103,6 @@ def get_environment_variables():
     )
     common_parser.add_argument("--batch_size", default=4, type=int, help="Test batch size")
     common_parser.add_argument(
-        "--model_checkpoint_dir",
-        type=str,
-        default=None,
-        help="The input path that contains the model files",
-    )
-    common_parser.add_argument(
-        "--metric_name",
-        default=None,
-        type=str,
-        help="Metric name in hugging face dataset",
-    )
-    common_parser.add_argument(
         "--output_dir",
         default="output",
         type=str,
@@ -122,49 +110,11 @@ def get_environment_variables():
     )
     common_args, _ = common_parser.parse_known_args()
 
-    # store parent directory name
-    parent_dir_name = os.path.basename(common_args.model_checkpoint_dir)
-    common_args.parent_dir_name = parent_dir_name
-
-    # reading the args already specified in finetuning here
-    # task_name, model_name_or_path, lora_args
-    finetune_args_path = os.path.join(common_args.model_checkpoint_dir, "finetune_args.json")
-    try:
-        with open(finetune_args_path, "r") as rptr:
-            finetune_args = json.load(rptr)
-    except Exception:
-        finetune_args = {}
-    # adding the finetune arguments
-    common_args.task_name = finetune_args.get("task_name", "SingleLabelClassification")
-    common_args.model_name_or_path = finetune_args.get("model_name_or_path", "bert-base-uncased")
-    common_args.apply_lora = finetune_args.get("apply_lora", False)
-    common_args.lora_alpha = finetune_args.get("lora_alpha", 128)
-    common_args.lora_dropout = finetune_args.get("lora_dropout", 8)
-    common_args.lora_r = finetune_args.get("lora_r", 0.0)
-
-    # task constant arguments
-    common_args.user_task_name = common_args.task_name
-    task_metadata = getattr(task_definitions, common_args.user_task_name)()
-    common_args.hf_task_name = task_metadata.hf_task_name
-    common_args.hf_problem_type = task_metadata.hf_problem_type
-    if common_args.hf_task_name is None:
-        raise ValidationException._with_error(
-            AzureMLError.create(TaskNotSupported, TaskName=common_args.user_task_name)
-        )
-    # task parameters
-    task_parser = get_task_parser(task_metadata)
-    task_args, _ = task_parser.parse_known_args()
-
     # combine common args and task related args
-    args = argparse.Namespace(**vars(common_args), **vars(task_args))
+    args = argparse.Namespace(**vars(common_args))
 
     # Check if the label_separator is not empty
     # This is applicable only for MultiLabelClassification
-    if getattr(args, "label_separator", None) and len(args.label_separator) == 0:
-        raise ArgumentException._with_error(
-            AzureMLError.create(EmptyLabelSeparator)
-        )
-
     # Convert the boolean variables from string to bool
     if isinstance(args.apply_ort, str):
         args.apply_ort = args.apply_ort.lower() == "true"
@@ -184,27 +134,6 @@ def get_environment_variables():
     # if_target_key_exist flag decides whether or not to do the label key formatting
     # if True ==> data format happens => metrics will be computed on model predictions
     # if False ==> ONLY model prediction happens
-    args.if_target_key_exist = False
-    for idx, var in enumerate(task_metadata.dataset_columns):
-        decoded_arg = getattr(args, var, None)  # This will translate to, for example, prompt = args.sentence1_key
-        if decoded_arg is not None:
-            if var == task_metadata.dataset_target_key:
-                args.if_target_key_exist = True
-            decode_dataset_columns.append(decoded_arg)
-            decode_datast_columns_dtypes.append(task_metadata.dataset_columns_dtypes[idx])
-    args.keep_columns = decode_dataset_columns
-    args.keep_columns_dtypes = decode_datast_columns_dtypes
-
-    # get the num_labels
-    with open(
-        os.path.join(args.model_checkpoint_dir, SaveFileConstants.ClassesSavePath),
-        "r",
-    ) as rptr:
-        class_names = json.load(rptr)[SaveFileConstants.ClassesSaveKey]
-        logger.info("Class names : {}".format(class_names))
-        args.num_labels = len(class_names)
-    logger.info("Args : {}".format(args))
-    # logger.info({"DEPLOYMENT_ARGS": json.dumps(vars(args))})
 
     return {SaveFileConstants.DeploymentSaveKey: json.dumps(vars(args))}
 
@@ -228,12 +157,6 @@ def main():
         help="script run mode",
     )
     # inputs to Register model
-    parser.add_argument(
-        "--model_checkpoint_dir",
-        type=str,
-        default=None,
-        help="The input path that contains the model files",
-    )
     parser.add_argument(
         "--name_for_registered_model",
         type=str,
@@ -299,10 +222,6 @@ def main():
     )
 
     args, _ = parser.parse_known_args()
-    #if args.model_checkpoint_dir is None:
-    #    raise ValidationException._with_error(
-    #        AzureMLError.create(InvalidCheckpointDirectory, dir=str(args.model_checkpoint_dir))
-    #    )
 
     # parse inference arguments to set as environment variables
     env_var = get_environment_variables()
@@ -407,6 +326,7 @@ def main():
             except Exception:
                 pass
         model_version = str(max(model_versions_list))
+        #model_version = 1
         #model = Model_v2(
         #    name=args.name_for_registered_model,
         #    version=model_version,
@@ -415,7 +335,7 @@ def main():
         #    type="custom_model",
         #)
         #ml_client.models.create_or_update(model)
-        model = ml_client.models.get(name=args.name_for_registered_model, version = model_version)
+        model = ml_client.models.get(name=args.name_for_registered_model)
         model_name, model_version = model.name, model.version
         logger.info(f"Registered model info v2: {model_name}:{model_version}")
 
@@ -477,7 +397,6 @@ def main():
     ml_client.begin_create_or_update(endpoint)
     logger.info("Deployment done")
     logger.info(f"{datetime.datetime.now().isoformat()} Scoring URI is : {endpoint.scoring_uri}")
-
 
 if __name__ == "__main__":
     main()
