@@ -5,10 +5,13 @@ import argparse
 
 from azure.ai.ml.entities import BatchEndpoint, BatchDeployment
 from azure.ai.ml.constants import BatchDeploymentOutputAction
+from azure.identity import ManagedIdentityCredential
 
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml.entities import ManagedOnlineEndpoint
 from azure.ai.ml import MLClient
+from azureml.core import Workspace, Run
+import os
 
 import json
 
@@ -56,10 +59,26 @@ def main():
 
     #### https://learn.microsoft.com/en-us/azure/machine-learning/how-to-use-batch-endpoint?tabs=python
 
+    print("Creating Batch Endpoint")
+    try:
+        endpoint = ml_client.batch_endpoints.get(args.endpoint_name)
+        print("Batch endpoint already exists")
+    # create batch endpoint
+    except:
+        print("Creating Endpoint")
+        batch_endpoint = BatchEndpoint(
+            name=args.endpoint_name 
+        )
+        
+        endpoint_job = ml_client.batch_endpoints.begin_create_or_update(batch_endpoint)
+        endpoint_job.wait()
+
+    print("Finished Batch endpoint creation -")
+    print("Creating Batch deployment")
     batch_deployment = BatchDeployment(
         name=args.deployment_name,
         endpoint_name=args.endpoint_name,
-        model=args.model_path,
+        model=args.model_path ,
         compute=args.compute,
         instance_count=args.instance_count,
         max_concurrency_per_instance=args.max_concurrency_per_instance,
@@ -69,7 +88,7 @@ def main():
     )
 
     deployment_job = ml_client.batch_deployments.begin_create_or_update(
-        deployment= 
+        batch_deployment
     )
     deployment_job.wait()
 
@@ -80,6 +99,7 @@ def main():
         batch_endpoint
     )
     endpoint_update_job.wait()
+    print("finished")
 
 if __name__ == "__main__":
     main()

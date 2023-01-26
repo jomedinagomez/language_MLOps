@@ -5,9 +5,12 @@ import argparse
 
 from azure.ai.ml.entities import ManagedOnlineEndpoint
 from azure.ai.ml.entities import ManagedOnlineDeployment
+from azure.identity import ManagedIdentityCredential
 
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import MLClient
+from azureml.core import Workspace, Run
+import os
 
 import json
 
@@ -22,18 +25,53 @@ def parse_args():
 
     return parser.parse_args()
 
+def generate_workspace():
+
+    run = Run.get_context(allow_offline=False)
+    ws = run.experiment.workspace
+    # v1: workspace object
+    ws.write_config()
+    print("Workspace file generated")
+
+    return ws
+
 def main():
     args = parse_args()
     print(args)
+
+    ws = generate_workspace()
     
     credential = DefaultAzureCredential()
     try:
-        ml_client = MLClient.from_config(credential, path='config.json')
+        client_id = os.environ.get("DEFAULT_IDENTITY_CLIENT_ID")
+        ml_client = MLClient.from_config(
+            ManagedIdentityCredential(client_id=client_id),
+                )
+
+        print("ML client loaded")
 
     except Exception as ex:
-        print("HERE IN THE EXCEPTION BLOCK")
+        print("Could not use Managed Identity to log into Azure")
         print(ex)
 
+    print("Creating batch endpoint")
+    try:
+        endpoint = ml_client.online_endpoints.get(args.endpoint_name)
+        print("Batch endpoint already exists")
+    # create batch endpoint
+
+    except:
+        print("Creating Endpoint")
+        online_endpoint = ManagedOnlineEndpoint(
+            name=args.endpoint_name, 
+            auth_mode=args.auth_mode,
+        )
+        
+        endpoint_job = ml_client.online_endpoints.begin_create_or_update(online_endpoint)
+        endpoint_job.wait()
+    
+    print("Finished Online endpoint creation -")
+    print("Creating online deployment")
     # Create online deployment
     online_deployment = ManagedOnlineDeployment(
         name=args.deployment_name,

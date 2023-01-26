@@ -10,43 +10,45 @@ inputs:
   # azureml:<<datasetname>>@latest or azureml:<<datasetname>>:<<version>>
   # azureml://subscriptions/<<subscriptionname>>/resourcegroups/<<resourcegroupname>>/workspaces/<<workspacename>>/datastores/workspaceblobstore/paths/PATH
   cpu_deployment_name: cpu-test
-  cpu_batch_deployment_name: cpu-test
-  gpu_batch_deployment_name: gpu-test
-
+  gpu_deployment_name: gpu-test
   
-  batch_endpoint_name: batch-sl-class-jamg-nlp-dev
-  online_endpoint_name: online-sl-class-jamg-nlp-dev
+  cpu_batch_endpoint_name: cpu-batch-sl-class-jamg-nlp-dev
+  gpu_batch_endpoint_name: gpu-batch-sl-class-jamg-nlp-dev
+  cpu_online_endpoint_name: cpu-online-sl-class-jamg-nlp-dev
+  gpu_online_endpoint_name: gpu-online-sl-class-jamg-nlp-dev
+  cpu_instance_type: Standard_F8s_v2
+
+  traffic_allocation: 100
+  instance_count: 1
+
   apply_ort: "false"
   apply_deepspeed: "false"
   description: Creating Batch endpoint to deploy NLP model
   name_for_registered_model: sample_model_single_label_classification
+  model_path: azureml:sample_model_single_label_classification:3
 
   batch_compute_name_gpu: sample-score-cluster-gpu
   batch_compute_name_cpu: sample-score-cluster-cpu
 
 jobs:
-  create_batch_endpoint:
-    type: command
-    component: ../code/components/create_batch_endpoint.yaml
-    compute: sample-managed-id-cluster
-    inputs:
-      endpoint_name: ${{parent.inputs.batch_endpoint_name}}
-      description: ${{parent.inputs.description}}
-
   create_online_endpoint:
     type: command
-    component: ../code/components/create_online_endpoint.yaml
+    component: ../code/components/create_online_deployment.yaml
     compute: sample-managed-id-cluster
     inputs:
-      endpoint_name: ${{parent.inputs.online_endpoint_name}}
-      description: ${{parent.inputs.description}}
+      deployment_name: ${{parent.inputs.cpu_deployment_name}}
+      endpoint_name: ${{parent.inputs.cpu_batch_endpoint_name}}
+      model_path : ${{parent.inputs.model_path}}
+      instance_type : ${{parent.inputs.cpu_instance_type}}
+      instance_count : ${{parent.inputs.instance_count}}
+      traffic_allocation : ${{parent.inputs.traffic_allocation}}
 
   cpu_create_batch_deployment:
     type: command
     component: ../code/components/create_batch_deployment.yaml
     compute: sample-managed-id-cluster
     inputs:
-      deployment_name: ${{parent.inputs.cpu_batch_deployment_name}}
-      endpoint_name: ${{parent.inputs.batch_endpoint_name}}
-      model_path : ${{parent.inputs.name_for_registered_model}}
+      deployment_name: ${{parent.inputs.cpu_deployment_name}}
+      endpoint_name: ${{parent.inputs.cpu_batch_endpoint_name}}
+      model_path : ${{parent.inputs.model_path}}
       compute : ${{parent.inputs.batch_compute_name_cpu}}
