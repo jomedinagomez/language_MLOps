@@ -37,7 +37,7 @@ jobs:
     compute: sample-managed-id-cluster
     inputs:
       deployment_name: ${{parent.inputs.cpu_deployment_name}}
-      endpoint_name: ${{parent.inputs.cpu_batch_endpoint_name}}
+      endpoint_name: ${{parent.inputs.cpu_online_endpoint_name}}
       model_path : ${{parent.inputs.model_path}}
       instance_type : ${{parent.inputs.cpu_instance_type}}
       instance_count : ${{parent.inputs.instance_count}}

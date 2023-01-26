@@ -64,7 +64,6 @@ def main():
         print("Creating Endpoint")
         online_endpoint = ManagedOnlineEndpoint(
             name=args.endpoint_name, 
-            auth_mode=args.auth_mode,
         )
         
         endpoint_job = ml_client.online_endpoints.begin_create_or_update(online_endpoint)

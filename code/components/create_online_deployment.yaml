@@ -5,7 +5,7 @@ $schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.jso
 
 name: azureml_textclassificationsinglelabel_deploy
 version: 0.0.1
-display_name: Deploy model on batch endpoint
+display_name: Deploy model Online endpoint
 is_deterministic: True
 type: command
 description: Component to deploy finetuned model for single label classification task
