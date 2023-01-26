@@ -7,6 +7,7 @@ from azure.ai.ml.entities import BatchEndpoint, BatchDeployment
 from azure.ai.ml.constants import BatchDeploymentOutputAction
 
 from azure.identity import DefaultAzureCredential
+from azure.ai.ml.entities import ManagedOnlineEndpoint
 from azure.ai.ml import MLClient
 
 import json
@@ -14,7 +15,6 @@ import json
 def parse_args():
     parser = argparse.ArgumentParser(description="Create batch deployment")
     parser.add_argument("--deployment_name", type=str, help="Name of batch deployment")
-    parser.add_argument("--description", type=str, help="Description of batch deployment")
     parser.add_argument("--endpoint_name", type=str, help="Name of the online endpoint")
     parser.add_argument("--model_path", type=str, help="Path to model or AML model")
     parser.add_argument("--compute", type=str, help="Name of the compute cluster")
@@ -25,21 +25,39 @@ def parse_args():
 
     return parser.parse_args()
 
+def generate_workspace():
+
+    run = Run.get_context(allow_offline=False)
+    ws = run.experiment.workspace
+    # v1: workspace object
+    ws.write_config()
+    print("Workspace file generated")
+
+    return ws
+
 def main():
     args = parse_args()
     print(args)
+
+    ws = generate_workspace()
     
     credential = DefaultAzureCredential()
     try:
-        ml_client = MLClient.from_config(credential, path='config.json')
+        client_id = os.environ.get("DEFAULT_IDENTITY_CLIENT_ID")
+        ml_client = MLClient.from_config(
+            ManagedIdentityCredential(client_id=client_id),
+                )
+
+        print("ML client loaded")
 
     except Exception as ex:
-        print("HERE IN THE EXCEPTION BLOCK")
+        print("Could not use Managed Identity to log into Azure")
         print(ex)
+
+    #### https://learn.microsoft.com/en-us/azure/machine-learning/how-to-use-batch-endpoint?tabs=python
 
     batch_deployment = BatchDeployment(
         name=args.deployment_name,
-        description=args.description,
         endpoint_name=args.endpoint_name,
         model=args.model_path,
         compute=args.compute,
@@ -51,7 +69,7 @@ def main():
     )
 
     deployment_job = ml_client.batch_deployments.begin_create_or_update(
-        deployment=batch_deployment
+        deployment= 
     )
     deployment_job.wait()
 
@@ -62,7 +80,6 @@ def main():
         batch_endpoint
     )
     endpoint_update_job.wait()
-
 
 if __name__ == "__main__":
     main()

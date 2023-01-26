@@ -55,6 +55,7 @@ def main():
     # create batch endpoint
 
     except:
+        print("Creating Endpoint")
         online_endpoint = ManagedOnlineEndpoint(
             name=args.endpoint_name, 
             auth_mode=args.auth_mode,
@@ -62,6 +63,8 @@ def main():
         
         endpoint_job = ml_client.online_endpoints.begin_create_or_update(online_endpoint)
         endpoint_job.wait()
+
+    print("Finished Online endpoint creation -")
 
 if __name__ == "__main__":
     main()
