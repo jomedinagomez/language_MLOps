@@ -11,20 +11,27 @@ inputs:
   # azureml://subscriptions/<<subscriptionname>>/resourcegroups/<<resourcegroupname>>/workspaces/<<workspacename>>/datastores/workspaceblobstore/paths/PATH
   cpu_deployment_name: cpu-test
   name_for_registered_model: sample_model_single_label_classification
-  endpoint_name: sl-class-jamg-nlp-dev
+  batch_endpoint_name: batch-sl-class-jamg-nlp-dev
+  online_endpoint_name: online-sl-class-jamg-nlp-dev
   cpu_instance_type: Standard_F8s_v2
   cpu_instance_count: 1
   apply_ort: "false"
   apply_deepspeed: "false"
+  description: Creating Batch endpoint to deploy NLP model
 
 jobs:
-  deploy:
+  create_batch_endpoint:
     type: command
-    component: ../code/components/deploy_model.yaml
+    component: ../code/components/create_batch_endpoint.yaml
     compute: sample-managed-id-cluster
     inputs:
-      name_for_registered_model: ${{parent.inputs.name_for_registered_model}}
-      endpoint_name: ${{parent.inputs.endpoint_name}}
-      instance_type: ${{parent.inputs.cpu_instance_type}}
-      instance_count: ${{parent.inputs.cpu_instance_count}}
-      deployment_name: ${{parent.inputs.cpu_deployment_name}}
+      endpoint_name: ${{parent.inputs.batch_endpoint_name}}
+      description: ${{parent.inputs.description}}
+
+  create_online_endpoint:
+    type: command
+    component: ../code/components/create_online_endpoint.yaml
+    compute: sample-managed-id-cluster
+    inputs:
+      endpoint_name: ${{parent.inputs.online_endpoint_name}}
+      description: ${{parent.inputs.description}}
