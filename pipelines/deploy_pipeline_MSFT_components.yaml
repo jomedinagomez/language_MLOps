@@ -9,6 +9,7 @@ inputs:
   # There are several ways to provide file, if its a data in
   # azureml:<<datasetname>>@latest or azureml:<<datasetname>>:<<version>>
   # azureml://subscriptions/<<subscriptionname>>/resourcegroups/<<resourcegroupname>>/workspaces/<<workspacename>>/datastores/workspaceblobstore/paths/PATH
+  deployment_type: cpu
   cpu_deployment_name: cpu-test
   gpu_deployment_name: gpu-test
   
@@ -31,7 +32,7 @@ inputs:
   batch_compute_name_cpu: sample-score-cluster-cpu
 
 jobs:
-  create_online_endpoint:
+  cpu_create_online_endpoint:
     type: command
     component: ../code/components/create_online_deployment.yaml
     compute: sample-managed-id-cluster
@@ -52,3 +53,4 @@ jobs:
       endpoint_name: ${{parent.inputs.cpu_batch_endpoint_name}}
       model_path : ${{parent.inputs.model_path}}
       compute : ${{parent.inputs.batch_compute_name_cpu}}
+      deployment_type : ${{parent.inputs.deployment_type}}

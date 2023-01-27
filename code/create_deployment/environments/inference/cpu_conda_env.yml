@@ -1,0 +1,12 @@
+name: cpu_nlp_inference_conda_env
+channels:
+- conda-forge
+dependencies:
+- python=3.8.15
+- pip<=22.2.2
+- pip:
+  - mlflow
+  - cloudpickle==2.2.0
+  - torch==1.11.0
+  - transformers==4.21.1
+  - azureml-evaluate-mlflow @ https://scorestorageforgeneric.blob.core.windows.net/libs/azureml_evaluate_mlflow-0.1.0.75711390-py3-none-any.whl

@@ -6,6 +6,7 @@ import argparse
 from azure.ai.ml.entities import BatchEndpoint, BatchDeployment
 from azure.ai.ml.constants import BatchDeploymentOutputAction
 from azure.identity import ManagedIdentityCredential
+from azure.ai.ml.entities import Environment, BuildContext
 
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml.entities import ManagedOnlineEndpoint
@@ -25,6 +26,7 @@ def parse_args():
     parser.add_argument("--max_concurrency_per_instance", type=int, help="Maximum number of cuncurrent jobs per instance", default=4)
     parser.add_argument("--mini_batch_size", type=int, help="The number of examples to score per job", default=32)
     parser.add_argument("--output_file_name", type=str, help="Output file name", default="predictions.csv")
+    parser.add_argument("--deployment_type", type=str, help="Output file name")
 
     return parser.parse_args()
 
@@ -74,10 +76,31 @@ def main():
         endpoint_job.wait()
 
     print("Finished Batch endpoint creation -")
+
+    print("Creating environment object")
+    
+    if args.deployment_type == 'cpu':
+        print("Creating CPU image")
+        base_image = "mcr.microsoft.com/azureml/curated/minimal-ubuntu18.04-py37-cpu-inference"
+        env_path = 'environments/inference/cpu_conda_env.yml'
+        environment = Environment(
+            image=base_image,
+            conda_file=env_path
+        )
+    else:
+        print("Creating GPU image")
+        base_image = "mcr.microsoft.com/azureml/curated/minimal-ubuntu18.04-py37-cuda11.0.3-gpu-inference"
+        env_path = 'environments/inference/gpu_conda_env.yml'
+        environment = Environment(
+            image=base_image,
+            conda_file=env_path
+        )
+
     print("Creating Batch deployment")
     batch_deployment = BatchDeployment(
         name=args.deployment_name,
         endpoint_name=args.endpoint_name,
+        environment=environment,
         model=args.model_path ,
         compute=args.compute,
         instance_count=args.instance_count,
