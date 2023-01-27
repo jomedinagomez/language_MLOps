@@ -36,7 +36,8 @@ jobs:
     component: azureml://registries/azureml-preview/components/textclassificationsinglelabel_modelselection/versions/0.0.7
     compute: sample-preprocess-cluster
     inputs:
-      huggingface_id: bert-base-uncased
+      #huggingface_id: bert-base-uncased
+      model_id: bert-base-uncased
     outputs:
       output_dir:
         type: uri_folder
@@ -66,7 +67,7 @@ jobs:
       lora_alpha: 128
       lora_r: 8
       lora_dropout: 0.0
-      epochs: 6
+      epochs: 1
       learning_rate: 2e-5
       train_batch_size: 1
       valid_batch_size: 1

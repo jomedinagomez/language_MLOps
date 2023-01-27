@@ -81,7 +81,7 @@ def main():
     
     if args.deployment_type == 'cpu':
         print("Creating CPU image")
-        base_image = "mcr.microsoft.com/azureml/curated/minimal-ubuntu18.04-py37-cpu-inference"
+        base_image = "mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference:latest"
         env_path = 'environments/inference/cpu_conda_env.yml'
         environment = Environment(
             image=base_image,
