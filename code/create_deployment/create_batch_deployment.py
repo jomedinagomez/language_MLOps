@@ -26,7 +26,7 @@ def parse_args():
     parser.add_argument("--max_concurrency_per_instance", type=int, help="Maximum number of cuncurrent jobs per instance", default=4)
     parser.add_argument("--mini_batch_size", type=int, help="The number of examples to score per job", default=32)
     parser.add_argument("--output_file_name", type=str, help="Output file name", default="predictions.csv")
-    parser.add_argument("--deployment_type", type=str, help="Output file name")
+    parser.add_argument("--deployment_type", type=str, help="Output file name -")
 
     return parser.parse_args()
 
@@ -87,7 +87,7 @@ def main():
             image=base_image,
             conda_file=env_path
         )
-    else:
+    else:   
         print("Creating GPU image")
         base_image = "mcr.microsoft.com/azureml/curated/minimal-ubuntu18.04-py37-cuda11.0.3-gpu-inference"
         env_path = 'environments/inference/gpu_conda_env.yml'
