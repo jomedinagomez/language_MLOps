@@ -1,7 +1,7 @@
 $schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
 type: pipeline
 experiment_name: AzureML-Train-Finetune-Samples
-display_name: roberta_large_pipeline_run_cli_singlelabel
+display_name: bert_large__uncased_pipeline_run_cli_singlelabel
 
 settings:
     force_rerun: False 
@@ -39,7 +39,7 @@ jobs:
     compute: sample-preprocess-cluster
     inputs:
       #huggingface_id: bert-base-uncased
-      model_id: roberta-large
+      model_id: bert-large-uncased
     outputs:
       output_dir:
         type: uri_folder
