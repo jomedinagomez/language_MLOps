@@ -76,7 +76,7 @@ jobs:
       valid_batch_size: 1
       apply_deepspeed: "true"
       apply_ort: "true"
-      apply_lora: "true"
+      apply_lora: "false"
       merge_lora_weights: "true"
       auto_find_batch_size: "false"
       save_as_mlflow_model: "true"
