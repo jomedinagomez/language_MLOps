@@ -74,9 +74,9 @@ jobs:
       learning_rate: 2e-5
       train_batch_size: 1
       valid_batch_size: 1
-      apply_deepspeed: "false"
+      apply_deepspeed: "true"
       apply_ort: "true"
-      apply_lora: "false"
+      apply_lora: "true"
       merge_lora_weights: "true"
       auto_find_batch_size: "false"
       save_as_mlflow_model: "true"
