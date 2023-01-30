@@ -37,7 +37,7 @@ inputs:
   
 
 code: ../create_deployment
-environment: azureml://registries/azureml-preview/environments/finetune-acpt-pytorch-111-py38-cuda113-gpu/versions/0.0.5
+environment: azureml://registries/azureml-preview/environments/finetune-acpt-pytorch-111-py38-cuda113-gpu/versions/0.0.4
 resources:
   instance_count: 1
 command: python create_batch_deployment.py --deployment_name ${{inputs.deployment_name}} --endpoint_name ${{inputs.endpoint_name}} --model_path ${{inputs.model_path}} --compute ${{inputs.compute}}  $[[--instance_count ${{inputs.instance_count}}]] --deployment_type ${{inputs.deployment_type}}

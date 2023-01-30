@@ -32,26 +32,26 @@ inputs:
   batch_compute_name_cpu: sample-score-cluster-cpu
 
 jobs:
-#  cpu_create_online_endpoint:
-#    type: command
-#    component: ../code/components/create_online_deployment.yaml
-#    compute: sample-managed-id-cluster
-#    inputs:
-#      deployment_name: ${{parent.inputs.cpu_deployment_name}}
-#      endpoint_name: ${{parent.inputs.cpu_online_endpoint_name}}
-#      model_path : ${{parent.inputs.model_path}}
-#      instance_type : ${{parent.inputs.cpu_instance_type}}
-#      instance_count : ${{parent.inputs.instance_count}}
-#      traffic_allocation : ${{parent.inputs.traffic_allocation}}
-
-  cpu_create_batch_deployment:
+  cpu_create_online_endpoint:
     type: command
-    component: ../code/components/create_batch_deployment.yaml
+    component: ../code/components/create_online_deployment.yaml
     compute: sample-managed-id-cluster
     inputs:
       deployment_name: ${{parent.inputs.cpu_deployment_name}}
-      endpoint_name: ${{parent.inputs.cpu_batch_endpoint_name}}
+      endpoint_name: ${{parent.inputs.cpu_online_endpoint_name}}
       model_path : ${{parent.inputs.model_path}}
-      compute : ${{parent.inputs.batch_compute_name_gpu}}
-      deployment_type : ${{parent.inputs.deployment_type}}
-      force_rerun: True
+      instance_type : ${{parent.inputs.cpu_instance_type}}
+      instance_count : ${{parent.inputs.instance_count}}
+      traffic_allocation : ${{parent.inputs.traffic_allocation}}
+
+#  gpu_create_batch_deployment:
+#    type: command
+#    component: ../code/components/create_batch_deployment.yaml
+#    compute: sample-managed-id-cluster
+#    inputs:
+#      deployment_name: ${{parent.inputs.gpu_deployment_name}}
+#      endpoint_name: ${{parent.inputs.gpu_batch_endpoint_name}}
+#      model_path : ${{parent.inputs.model_path}}
+#      compute : ${{parent.inputs.batch_compute_name_gpu}}
+#      deployment_type : ${{parent.inputs.deployment_type}}
+#      force_rerun: True
