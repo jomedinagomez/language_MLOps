@@ -79,6 +79,7 @@ def main():
 
     print("Creating environment object")
     
+    '''
     if args.deployment_type == 'cpu':
         print("Creating CPU image")
         base_image = "mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference:latest"
@@ -95,12 +96,11 @@ def main():
             image=base_image,
             conda_file=env_path
         )
-
-    print("Creating Batch deployment")
+    '''
+    print("Creating Batch deployment -")
     batch_deployment = BatchDeployment(
         name=args.deployment_name,
         endpoint_name=args.endpoint_name,
-        environment=environment,
         model=args.model_path ,
         compute=args.compute,
         instance_count=args.instance_count,
