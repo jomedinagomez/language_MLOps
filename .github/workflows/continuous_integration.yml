@@ -28,7 +28,7 @@ jobs:
       - name: AZ Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_SERVICE_PRINCIPAL_DEV }}   #setup: provide your Azure credentials name stored in github
+          creds: ${{ secrets.AZURE_SERVICE_PRINCIPAL_DEV}}   #setup: provide your Azure credentials name stored in github
 
       - name: Install az ml & set default values for AML
         run: | #setup: provide group, workspace and location
@@ -38,7 +38,7 @@ jobs:
         run: |
          ls -a  
          pwd
-         az ml job create -s -f pipelines/train_pipeline_MSFT_components.yaml
+         az ml job create -s -f pipelines/train_pipeline_MSFT_components.yaml --debug
 #      - name:  Create Pull Request to Main
 #        uses: thomaseizinger/create-pull-request@master
 #        with:
