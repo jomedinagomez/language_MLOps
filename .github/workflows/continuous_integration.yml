@@ -36,8 +36,9 @@ jobs:
           az configure --defaults group=language_dev_rg workspace=language_dev_ws location=eastus2   
       - name: run training and model validation
         run: |
-         ls -a
-         az ml job create -s -f pipelines/train_pipeline_MSFT_components.yml
+         ls -a  
+         pwd
+         az ml job create -s -f pipelines/train_pipeline_MSFT_components.yaml
 #      - name:  Create Pull Request to Main
 #        uses: thomaseizinger/create-pull-request@master
 #        with:
