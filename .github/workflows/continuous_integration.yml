@@ -37,7 +37,7 @@ jobs:
       - name: run training and model validation
         run: |
          ls -a  
-         az ml job create -s -f pipelines/train_pipeline_MSFT_components.yaml --debug
+         az ml job create -s -f pipelines/train_pipeline_MSFT_components.yaml
 #      - name:  Create Pull Request to Main
 #        uses: thomaseizinger/create-pull-request@master
 #        with:
