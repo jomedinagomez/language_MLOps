@@ -11,7 +11,7 @@ on:
       - train_pipeline_MSFT_components.yaml
       - .github/workflows/continuous_integration.yml
 jobs:
-  Workshop-Train-Validation:
+  Train-Validation:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
