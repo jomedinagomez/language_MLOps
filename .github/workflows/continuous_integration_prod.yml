@@ -1,24 +1,15 @@
-name: continuous_integration_dev
+name: continuous_integration_prod
 on:
   workflow_dispatch:
   pull_request:
     types:
-      - opened
+      - closed
     branches: 
-    - integration
+    - main
     paths:
       - code/**
       - train_pipeline_MSFT_components.yaml
-      - .github/workflows/continuous_integration.yml
-  push:
-    branches-ignore:
-      - main
-      - integration
-    paths:
-      - code/**
-      - train_pipeline_MSFT_components.yaml
-      - .github/workflows/continuous_integration.yml
-      
+      - .github/workflows/continuous_integration_prod.yml
 jobs:
   Train-Validation:
     runs-on: ubuntu-latest
@@ -46,7 +37,8 @@ jobs:
       - name: run training and model validation
         run: |
          ls -a  
-         az ml job create -s -f pipelines/train_pipeline_MSFT_components.yaml
+         pwd
+         az ml job create -s -f pipelines/train_pipeline_MSFT_components.yaml --debug
 #      - name:  Create Pull Request to Main
 #        uses: thomaseizinger/create-pull-request@master
 #        with:
