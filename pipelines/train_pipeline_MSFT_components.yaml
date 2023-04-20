@@ -105,6 +105,6 @@ jobs:
     compute: sample-managed-id-cluster
     inputs:
       model_path: ${{parent.jobs.finetuning.outputs.mlflow_model_folder}}
-      name_for_registered_model: ${{parent.inputs.name_for_registered_model}}
+      model_name: ${{parent.inputs.name_for_registered_model}}
       model_type: mlflow_model
       registry_name: ""
