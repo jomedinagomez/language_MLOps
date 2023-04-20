@@ -35,7 +35,7 @@ inputs:
 jobs:
   model_selection:
     type: command
-    component: azureml://registries/azureml-preview/components/textclassificationsinglelabel_modelselection/versions/0.0.7
+    component: azureml://registries/azureml-preview/components/textclassificationsinglelabel_modelselection/versions/0.0.12
     compute: sample-preprocess-cluster
     inputs:
       #huggingface_id: bert-base-uncased
@@ -46,7 +46,7 @@ jobs:
 
   data_pre_process:
     type: command
-    component: azureml://registries/azureml-preview/components/textclassificationsinglelabel_datapreprocessing/versions/0.0.7
+    component: azureml://registries/azureml-preview/components/textclassificationsinglelabel_datapreprocessing/versions/0.0.12
     compute: sample-preprocess-cluster
     inputs:
       model_path: ${{parent.jobs.model_selection.outputs.output_dir}}
@@ -61,7 +61,7 @@ jobs:
   
   finetuning:
     type: command
-    component: azureml://registries/azureml-preview/components/textclassificationsinglelabel_finetuning/versions/0.0.7
+    component: azureml://registries/azureml-preview/components/textclassificationsinglelabel_finetuning/versions/0.0.12
     compute: sample-finetune-cluster
     
     inputs:
@@ -89,7 +89,7 @@ jobs:
 
   evaluate_model:
     type: command
-    component: azureml://registries/azureml-preview/components/evaluate_model/versions/0.0.4.preview
+    component: azureml://registries/azureml-preview/components/evaluate_model/versions/0.0.10.preview
     compute: sample-finetune-cluster
     inputs:
       task: text-classification
@@ -101,7 +101,7 @@ jobs:
 
   register:
     type: command
-    component: azureml://registries/azureml-preview/components/register_model/versions/0.0.7
+    component: azureml://registries/azureml/components/register_model/versions/0.0.2
     compute: sample-managed-id-cluster
     inputs:
       model_path: ${{parent.jobs.finetuning.outputs.mlflow_model_folder}}
