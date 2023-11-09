@@ -1,6 +1,6 @@
 $schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
 type: pipeline
-experiment_name: AzureML-Deploy-Samples-gpu-batch
+experiment_name: AzureML-Deploy-Samples-gpu
 display_name: deploy_azureml_textclassificationsinglelabel
 
 # You can change path to your custom files by registering in Data and use their 'Named asset URI' below
@@ -43,15 +43,3 @@ jobs:
       instance_type : ${{parent.inputs.cpu_instance_type}}
       instance_count : ${{parent.inputs.instance_count}}
       traffic_allocation : ${{parent.inputs.traffic_allocation}}
-
-#  gpu_create_batch_deployment:
-#    type: command
-#    component: ../code/components/create_batch_deployment.yaml
-#    compute: sample-managed-id-cluster
-#    inputs:
-#      deployment_name: ${{parent.inputs.gpu_deployment_name}}
-#      endpoint_name: ${{parent.inputs.gpu_batch_endpoint_name}}
-#      model_path : ${{parent.inputs.model_path}}
-#      compute : ${{parent.inputs.batch_compute_name_gpu}}
-#      deployment_type : ${{parent.inputs.deployment_type}}
-#      force_rerun: True
