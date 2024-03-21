@@ -19,13 +19,13 @@ inputs:
     path: azureml://registries/azureml/models/distilroberta-base/versions/15
 
   train_file:
-    path: azureml:MultiLabelClassification_train@latest #Input 
+    path: azureml:intent_class_train@latest #Input 
     type: uri_file
   validation_file:
-    path: azureml:MultiLabelClassification_validation@latest
+    path: azureml:intent_class_validation@latest
     type: uri_file
   test_file:
-    path: azureml:MultiLabelClassification_test@latest
+    path: azureml:intent_class_validation@latest
     type: uri_file
   # deepspeed config files
   ds_finetune:
@@ -76,7 +76,7 @@ jobs:
       lora_alpha: 128
       lora_r: 8
       lora_dropout: 0.0
-      num_train_epochs: 1
+      num_train_epochs: 8
       learning_rate: 5E-05
       per_device_train_batch_size: 1
       per_device_eval_batch_size: 1
