@@ -15,6 +15,9 @@ inputs:
   # azureml://subscriptions/<<subscriptionname>>/resourcegroups/<<resourcegroupname>>/workspaces/<<workspacename>>/datastores/workspaceblobstore/paths/PATH
   name_for_registered_model: sample_model_single_label_classification
 
+  mlflow_model_path: 
+    path: azureml://registries/azureml/models/distilroberta-base/versions/15
+
   train_file:
     path: azureml:MultiLabelClassification_train@latest #Input 
     type: uri_file
@@ -33,25 +36,27 @@ inputs:
     type: uri_file
 
 jobs:
+#https://ml.azure.com/registries/azureml/components/text_classification_model_import
   model_selection:
     type: command
     component: azureml://registries/azureml/components/text_classification_model_import/versions/0.0.37
     compute: sample-preprocess-cluster
     inputs:
       #huggingface_id: bert-base-uncased
-      model_id: bert-base-uncased
+      mlflow_model_path: ${{parent.inputs.mlflow_model_path}}
     outputs:
       output_dir:
         type: uri_folder
 
+#https://ml.azure.com/registries/azureml/components/text_classification_datapreprocess
   data_pre_process:
     type: command
     component: azureml://registries/azureml/components/text_classification_datapreprocess/versions/0.0.37
     compute: sample-preprocess-cluster
     inputs:
-      model_path: ${{parent.jobs.model_selection.outputs.output_dir}}
+      model_selector_output: ${{parent.jobs.model_selection.outputs.output_dir}}
       train_file_path: ${{parent.inputs.train_file}}
-      valid_file_path: ${{parent.inputs.validation_file}}
+      validation_file_path: ${{parent.inputs.validation_file}}
       sentence1_key: sentence
       sentence2_key: ""
       label_key: label
@@ -59,51 +64,85 @@ jobs:
       output_dir:
         type: uri_folder
 
+#https://ml.azure.com/registries/azureml/components/text_classification_finetune
   finetuning:
     type: command
     component: azureml://registries/azureml/components/text_classification_finetune/versions/0.0.37
     compute: sample-finetune-cluster
     
     inputs:
-      model_path: ${{parent.jobs.model_selection.outputs.output_dir}}
-      dataset_path: ${{parent.jobs.data_pre_process.outputs.output_dir}}
+      model_selector_output: ${{parent.jobs.model_selection.outputs.output_dir}}
+      preprocess_output: ${{parent.jobs.data_pre_process.outputs.output_dir}}
       lora_alpha: 128
       lora_r: 8
       lora_dropout: 0.0
-      epochs: 1
-      learning_rate: 2e-5
-      train_batch_size: 1
-      valid_batch_size: 1
+      num_train_epochs: 1
+      learning_rate: 5E-05
+      per_device_train_batch_size: 1
+      per_device_eval_batch_size: 1
+      gradient_accumulation_steps: 2
+      weight_decay: 0.014053648905627663
       apply_deepspeed: "true"
       apply_ort: "true"
       apply_lora: "false"
       merge_lora_weights: "true"
       auto_find_batch_size: "false"
-      save_as_mlflow_model: "true"
     outputs:
       pytorch_model_folder:
         type: uri_folder
+
+#https://ml.azure.com/registries/azureml/components/ft_nlp_model_converter
+  model_converter:
+    type: command
+    component: azureml://registries/azureml/components/ft_nlp_model_converter/versions/0.0.37
+    compute: sample-finetune-cluster
+    
+    inputs:
+      model_path: ${{parent.jobs.finetuning.outputs.pytorch_model_folder}}
+ 
+    outputs:
       mlflow_model_folder:
         type: mlflow_model
 
-  evaluate_model:
+#https://ml.azure.com/registries/azureml/components/model_prediction
+  model_prediction:
     type: command
-    component: azureml://registries/azureml/components/evaluate_model/versions/0.0.18
+    component: azureml://registries/azureml/components/model_prediction/versions/0.0.22
     compute: sample-finetune-cluster
     inputs:
       task: text-classification
-      test_data: ${{parent.inputs.validation_file}}
-      mlflow_model: ${{parent.jobs.finetuning.outputs.mlflow_model_folder}}
-      test_data_label_column_name: label
-      test_data_input_column_names: sentence
+      test_data: ${{parent.jobs.data_pre_process.outputs.output_dir}}
+      mlflow_model: ${{parent.jobs.model_converter.outputs.mlflow_model_folder}}
+      label_column_name: label
+      input_column_names: sentence
       device: gpu
+    outputs:
+      predictions:
+        type: uri_file
+      prediction_probabilities:
+        type: uri_file
+      ground_truth:
+        type: uri_file
 
+#https://ml.azure.com/registries/azureml/components/compute_metrics
+  compute_metrics:
+    type: command
+    component: azureml://registries/azureml/components/compute_metrics/versions/0.0.22
+    compute: sample-finetune-cluster
+    inputs:
+      task: text-classification
+      ground_truth: ${{parent.jobs.model_prediction.outputs.ground_truth}}
+      prediction: ${{parent.jobs.model_prediction.outputs.predictions}}
+      prediction_probabilities: ${{parent.jobs.model_prediction.outputs.prediction_probabilities}}
+  
+
+#https://ml.azure.com/registries/azureml/components/register_model
   register:
     type: command
     component: azureml://registries/azureml/components/register_model/versions/0.0.12
     compute: sample-managed-id-cluster
     inputs:
-      model_path: ${{parent.jobs.finetuning.outputs.mlflow_model_folder}}
+      model_path: ${{parent.jobs.model_converter.outputs.mlflow_model_folder}}
       model_name: ${{parent.inputs.name_for_registered_model}}
       model_type: mlflow_model
       registry_name: ""
