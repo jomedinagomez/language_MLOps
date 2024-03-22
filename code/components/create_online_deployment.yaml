@@ -36,7 +36,7 @@ inputs:
     description: Name of compute to be used for deployment 
 
 code: ../create_deployment
-environment: azureml://registries/azureml-preview/environments/finetune-acpt-pytorch-111-py38-cuda113-gpu/versions/0.0.12
+environment: azureml://registries/azureml/environments/python-sdk-v2/versions/12
 resources:
   instance_count: 1
 command: python create_online_deployment.py --deployment_name ${{inputs.deployment_name}} --endpoint_name ${{inputs.endpoint_name}} --model_path ${{inputs.model_path}} --instance_type ${{inputs.instance_type}} --instance_count ${{inputs.instance_count}} --traffic_allocation ${{inputs.traffic_allocation}} 

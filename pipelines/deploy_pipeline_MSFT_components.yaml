@@ -12,9 +12,9 @@ inputs:
   deployment_type: cpu
   cpu_deployment_name: cpu-test
  
-  cpu_online_endpoint_name: cpu-online-sl-class-nlp-dev
+  cpu_online_endpoint_name: cpu-online-sl-class-nlp-dev3
  
-  cpu_instance_type: Standard_F8s_v2
+  cpu_instance_type: Standard_F16s_v2
 
   traffic_allocation: 100
   instance_count: 1
@@ -22,9 +22,8 @@ inputs:
   apply_ort: "false"
   apply_deepspeed: "false"
   description: Creating Online endpoint to deploy NLP model --
-  name_for_registered_model: sample_model_single_label_classification
-  model_path: azureml:sample_model_single_label_classification@latest
-
+  name_for_registered_model: sample-model-single-label-classification
+  model_path: azureml:sample-model-single-label-classification:7
 
 jobs:
   cpu_create_online_endpoint:

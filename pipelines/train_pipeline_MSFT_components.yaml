@@ -76,7 +76,7 @@ jobs:
       lora_alpha: 128
       lora_r: 8
       lora_dropout: 0.0
-      num_train_epochs: 8
+      num_train_epochs: 9
       learning_rate: 5E-05
       per_device_train_batch_size: 1
       per_device_eval_batch_size: 1
@@ -111,7 +111,7 @@ jobs:
     compute: sample-finetune-cluster
     inputs:
       task: text-classification
-      test_data: ${{parent.jobs.data_pre_process.outputs.output_dir}}
+      test_data: ${{parent.inputs.validation_file}}
       mlflow_model: ${{parent.jobs.model_converter.outputs.mlflow_model_folder}}
       label_column_name: Topic
       input_column_names: Question

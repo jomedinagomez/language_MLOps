@@ -5,6 +5,7 @@ import argparse
 
 from azure.ai.ml.entities import ManagedOnlineEndpoint
 from azure.ai.ml.entities import ManagedOnlineDeployment
+from azure.ai.ml.entities import ProbeSettings
 from azure.identity import ManagedIdentityCredential
 
 from azure.identity import DefaultAzureCredential
@@ -78,6 +79,7 @@ def main():
         model=args.model_path,
         instance_type=args.instance_type,
         instance_count=args.instance_count,
+        liveness_probe=ProbeSettings(initial_delay=600)
     )
 
     deployment_job = ml_client.online_deployments.begin_create_or_update(
