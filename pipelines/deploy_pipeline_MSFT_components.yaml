@@ -11,12 +11,9 @@ inputs:
   # azureml://subscriptions/<<subscriptionname>>/resourcegroups/<<resourcegroupname>>/workspaces/<<workspacename>>/datastores/workspaceblobstore/paths/PATH
   deployment_type: cpu
   cpu_deployment_name: cpu-test
-  gpu_deployment_name: gpu-test
-  
-  cpu_batch_endpoint_name: cpu-batch-sl-class-jamg-nlp-dev
-  gpu_batch_endpoint_name: gpu-batch-sl-class-jamg-nlp-dev
-  cpu_online_endpoint_name: cpu-online-sl-class-jamg-nlp-dev
-  gpu_online_endpoint_name: gpu-online-sl-class-jamg-nlp-dev
+ 
+  cpu_online_endpoint_name: cpu-online-sl-class-nlp-dev
+ 
   cpu_instance_type: Standard_F8s_v2
 
   traffic_allocation: 100
@@ -24,12 +21,10 @@ inputs:
 
   apply_ort: "false"
   apply_deepspeed: "false"
-  description: Creating Batch endpoint to deploy NLP model --
+  description: Creating Online endpoint to deploy NLP model --
   name_for_registered_model: sample_model_single_label_classification
-  model_path: azureml:sample_model_single_label_classification:4
+  model_path: azureml:sample_model_single_label_classification@latest
 
-  batch_compute_name_gpu: sample-score-cluster-gpu
-  batch_compute_name_cpu: sample-score-cluster-cpu
 
 jobs:
   cpu_create_online_endpoint:

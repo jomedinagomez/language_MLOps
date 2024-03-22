@@ -57,9 +57,9 @@ jobs:
       model_selector_output: ${{parent.jobs.model_selection.outputs.output_dir}}
       train_file_path: ${{parent.inputs.train_file}}
       validation_file_path: ${{parent.inputs.validation_file}}
-      sentence1_key: sentence
+      sentence1_key: Question
       sentence2_key: ""
-      label_key: label
+      label_key: Topic
     outputs:
       output_dir:
         type: uri_folder
@@ -113,8 +113,8 @@ jobs:
       task: text-classification
       test_data: ${{parent.jobs.data_pre_process.outputs.output_dir}}
       mlflow_model: ${{parent.jobs.model_converter.outputs.mlflow_model_folder}}
-      label_column_name: label
-      input_column_names: sentence
+      label_column_name: Topic
+      input_column_names: Question
       device: gpu
     outputs:
       predictions:
