@@ -82,10 +82,10 @@ jobs:
       per_device_eval_batch_size: 1
       gradient_accumulation_steps: 2
       weight_decay: 0.014053648905627663
-      apply_deepspeed: "true"
-      apply_ort: "true"
+      apply_deepspeed: "false"
+      apply_ort: "false"
       apply_lora: "false"
-      merge_lora_weights: "true"
+      merge_lora_weights: "false"
       auto_find_batch_size: "false"
     outputs:
       pytorch_model_folder:
