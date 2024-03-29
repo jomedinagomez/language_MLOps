@@ -47,10 +47,3 @@ jobs:
         run: |
          ls -a  
          az ml job create -s -f pipelines/train_pipeline_MSFT_components.yaml
-#      - name:  Create Pull Request to Main
-#        uses: thomaseizinger/create-pull-request@master
-#        with:
-#          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN_GITHUB_DEV }} #setup: provide your github secret name
-#          head: ${{ github.ref }}
-#          base: main
-#          title: "An automatically created PR to main by successful CI"
